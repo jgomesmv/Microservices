@@ -10,12 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
-using TrainingManagement.IntegrationEvents;
+using RegistrationManagement.IntegrationEvents.EventHandling;
+using RegistrationManagement.IntegrationEvents.Events;
 using TrainingManagementSystem.EventBus;
 using TrainingManagementSystem.EventBus.Abstractions;
 using TrainingManagementSystem.EventBusRabbitMQ;
+using TrainingManagementSystem.EventBusServiceBus;
 
-namespace TrainingManagement
+namespace RegistrationManagement
 {
     public class Startup
     {
@@ -30,8 +32,6 @@ namespace TrainingManagement
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
-            services.AddTransient<ITrainingSessionIntegrationEventService, TrainingSessionIntegrationEventService>();
 
             services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
             {
@@ -52,6 +52,8 @@ namespace TrainingManagement
 
             RegisterEventBus(services);
         }
+
+        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -79,18 +81,18 @@ namespace TrainingManagement
 
                 return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, retryCount);
             });
-
+            
 
             services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
 
-            //services.AddTransient<TrainingSessionChangedIntegrationEventHandler>();
+            services.AddTransient<TrainingSessionChangedIntegrationEventHandler>();
         }
 
         private void ConfigureEventBus(IApplicationBuilder app)
         {
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
 
-            //eventBus.Subscribe<TrainingSessionChangedIntegrationEvent, TrainingSessionChangedIntegrationEventHandler>();
+            eventBus.Subscribe<TrainingSessionChangedIntegrationEvent, TrainingSessionChangedIntegrationEventHandler>();
         }
     }
 }

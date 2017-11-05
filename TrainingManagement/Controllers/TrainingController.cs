@@ -3,12 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TrainingManagement.IntegrationEvents;
+using TrainingManagement.IntegrationEvents.Events;
+using TrainingManagementSystem.EventBus.Abstractions;
 
 namespace TrainingManagement.Controllers
 {
     [Route("TrainingManagement/[controller]")]
-    public class TrainingController : Controller
+    public class TrainingController : ControllerBase
     {
+        private readonly ITrainingSessionIntegrationEventService _trainingSessionIntegrationEventService;
+
+        public TrainingController(ITrainingSessionIntegrationEventService trainingSessionIntegrationEventService)
+        {
+            _trainingSessionIntegrationEventService = trainingSessionIntegrationEventService;      
+        }
+
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
@@ -27,6 +37,9 @@ namespace TrainingManagement.Controllers
         [HttpPost]
         public void Post([FromBody]string value)
         {
+            var trainingSessionChangedEvent = new TrainingSessionChangedIntegrationEvent(1, "Session 1", 12);
+
+            _trainingSessionIntegrationEventService.PublishThroughEventBusAsync(trainingSessionChangedEvent);
         }
 
         // PUT api/values/5
