@@ -3,24 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using RegistrationManagement.Model;
 
 namespace RegistrationManagement.Controllers
 {
-    [Route("TrainingManagement/[controller]")]
+    [Route("RegistrationManagement/Registration")]
     public class RegistrationController : Controller
     {
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public JsonResult Get()
         {
-            return new string[] { "value1", "value2" };
+            return Json(DataAccess.GetAllSessions());
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public JsonResult Get(int id)
         {
-            return "value";
+            return Json(DataAccess.GetSession(id));
         }
 
         // POST api/values

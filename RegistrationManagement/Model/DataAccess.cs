@@ -21,7 +21,7 @@ namespace RegistrationManagement.Model
 
         private static IList<Session> Sessions { get; set; }
 
-        public static  IList<Session> GetAllSessions()
+        public static async Task<IList<Session>> GetAllSessions()
         {
             return Sessions;
         }
