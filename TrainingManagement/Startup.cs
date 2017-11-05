@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +29,7 @@ namespace TrainingManagement
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
 
@@ -42,15 +44,22 @@ namespace TrainingManagement
                     HostName = "localhost"
                 };
 
-                factory.UserName = "testUserName";
-                factory.Password = "testPassword";
-
+                //factory.UserName = "user";
+                //factory.Password = "password";
+                factory.VirtualHost = "/";
+                factory.Protocol = Protocols.DefaultProtocol;
+                factory.Port = AmqpTcpEndpoint.UseDefaultPort;
                 var retryCount = 5;
 
                 return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
             });
 
             RegisterEventBus(services);
+
+            var container = new ContainerBuilder();
+            container.Populate(services);
+
+            return new AutofacServiceProvider(container.Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,4 +1,5 @@
 ﻿using RegistrationManagement.IntegrationEvents.Events;
+using RegistrationManagement.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,7 @@ namespace RegistrationManagement.IntegrationEvents.EventHandling
     {
         public async Task Handle(TrainingSessionChangedIntegrationEvent @event)
         {
-            // Add logic here
-
-            return;
+            await DataAccess.UpdateSession(new DataAccess.Session { Id = @event.TrainingSessionId, Name = @event.Name, MaxReservationsNumber = @event.MaxReservationsNumber });
         }
     }
 }
